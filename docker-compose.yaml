@@ -59,6 +59,7 @@ services:
     depends_on:
       - kafka
       - iot-ingress-service
+      - postgres-db
     networks:
       - my-network
 
@@ -89,6 +90,7 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+      - ./data-store/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
     networks:
       - my-network
 
@@ -117,6 +119,10 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
     volumes:
       - ./iot-cloud-controller/App:/app   # Mount the app directory for live changes
+    depends_on:
+      - mongodb
+      - iot-ingress-service
+      - kafka
     networks:
       - my-network
 

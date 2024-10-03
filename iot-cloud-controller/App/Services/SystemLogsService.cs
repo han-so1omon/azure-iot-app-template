@@ -10,7 +10,10 @@ namespace YourNamespace.Services
 
         public SystemLogsService(IOptions<DatabaseSettings> databaseSettings)
         {
-            var mongoClient = new MongoClient(databaseSettings.Value.ConnectionString);
+            // Create a MongoClient with proper credentials
+            var settings = MongoClientSettings.FromConnectionString(databaseSettings.Value.ConnectionString);
+
+            var mongoClient = new MongoClient(settings);
             var mongoDatabase = mongoClient.GetDatabase(databaseSettings.Value.DatabaseName);
 
             _systemLogsCollection = mongoDatabase.GetCollection<SystemLog>("SystemLogs");

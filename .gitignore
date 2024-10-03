@@ -5,7 +5,7 @@ obj/
 *.suo
 *.userosscache
 *.sln.docstates
-*.vs/
+.vs/
 .vscode/
 *.csproj.user
 *.csproj.nuget.g.props
@@ -16,6 +16,10 @@ obj/
 *.cache
 *.log
 *.ide
+*.db
+*.sqlite
+*.sqlite3
+*.bak
 
 # Ignore for Node.js
 node_modules/
