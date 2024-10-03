@@ -1,0 +1,253 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "resources": [
+      {
+        "type": "Microsoft.DBforPostgreSQL/servers",
+        "apiVersion": "2017-12-01",
+        "name": "myPostgreSQLServer",
+        "location": "[resourceGroup().location]",
+        "sku": {
+          "name": "GP_Gen5_2",
+          "tier": "GeneralPurpose",
+          "family": "Gen5",
+          "capacity": 2
+        },
+        "properties": {
+          "administratorLogin": "adminuser",
+          "administratorLoginPassword": "SecurePassword123!",
+          "version": "11",
+          "storageProfile": {
+            "storageMB": 51200,
+            "backupRetentionDays": 7,
+            "geoRedundantBackup": "Disabled"
+          },
+          "sslEnforcement": "Enabled"
+        }
+      },
+      {
+        "type": "Microsoft.HDInsight/clusters",
+        "apiVersion": "2018-06-01-preview",
+        "name": "kafkaCluster",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "clusterVersion": "4.0",
+          "osType": "Linux",
+          "tier": "Standard",
+          "clusterDefinition": {
+            "kind": "Kafka",
+            "componentVersion": {
+              "Kafka": "2.1"
+            },
+            "configurations": {}
+          },
+          "computeProfile": {
+            "roles": [
+              {
+                "name": "headnode",
+                "targetInstanceCount": 2,
+                "hardwareProfile": {
+                  "vmSize": "Standard_D3_V2"
+                }
+              },
+              {
+                "name": "workernode",
+                "targetInstanceCount": 3,
+                "hardwareProfile": {
+                  "vmSize": "Standard_D3_V2"
+                }
+              },
+              {
+                "name": "zookeepernode",
+                "targetInstanceCount": 3,
+                "hardwareProfile": {
+                  "vmSize": "Standard_D3_V2"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "type": "Microsoft.ContainerInstance/containerGroups",
+        "apiVersion": "2019-12-01",
+        "name": "python-app",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "containers": [
+            {
+              "name": "python-app",
+              "properties": {
+                "image": "myregistry.azurecr.io/my-python-app:latest",
+                "resources": {
+                  "requests": {
+                    "cpu": 1,
+                    "memoryInGB": 1.5
+                  }
+                },
+                "ports": [
+                  {
+                    "port": 8000
+                  }
+                ]
+              }
+            }
+          ],
+          "osType": "Linux",
+          "ipAddress": {
+            "type": "Public",
+            "ports": [
+              {
+                "protocol": "TCP",
+                "port": 8000
+              }
+            ]
+          },
+          "restartPolicy": "OnFailure",
+          "imageRegistryCredentials": [
+            {
+              "server": "myregistry.azurecr.io",
+              "username": "myregistry",
+              "password": "myregistryPassword"
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.ContainerInstance/containerGroups",
+        "apiVersion": "2019-12-01",
+        "name": "nextjs-app1",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "containers": [
+            {
+              "name": "nextjs-app1",
+              "properties": {
+                "image": "myregistry.azurecr.io/my-nextjs-app1:latest",
+                "resources": {
+                  "requests": {
+                    "cpu": 1,
+                    "memoryInGB": 1.5
+                  }
+                },
+                "ports": [
+                  {
+                    "port": 3000
+                  }
+                ]
+              }
+            }
+          ],
+          "osType": "Linux",
+          "ipAddress": {
+            "type": "Public",
+            "ports": [
+              {
+                "protocol": "TCP",
+                "port": 3000
+              }
+            ]
+          },
+          "restartPolicy": "OnFailure",
+          "imageRegistryCredentials": [
+            {
+              "server": "myregistry.azurecr.io",
+              "username": "myregistry",
+              "password": "myregistryPassword"
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.ContainerInstance/containerGroups",
+        "apiVersion": "2019-12-01",
+        "name": "nextjs-app2",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "containers": [
+            {
+              "name": "nextjs-app2",
+              "properties": {
+                "image": "myregistry.azurecr.io/my-nextjs-app2:latest",
+                "resources": {
+                  "requests": {
+                    "cpu": 1,
+                    "memoryInGB": 1.5
+                  }
+                },
+                "ports": [
+                  {
+                    "port": 3000
+                  }
+                ]
+              }
+            }
+          ],
+          "osType": "Linux",
+          "ipAddress": {
+            "type": "Public",
+            "ports": [
+              {
+                "protocol": "TCP",
+                "port": 3000
+              }
+            ]
+          ],
+          "restartPolicy": "OnFailure",
+          "imageRegistryCredentials": [
+            {
+              "server": "myregistry.azurecr.io",
+              "username": "myregistry",
+              "password": "myregistryPassword"
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.ContainerInstance/containerGroups",
+        "apiVersion": "2019-12-01",
+        "name": "csharp-app1",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "containers": [
+            {
+              "name": "csharp-app1",
+              "properties": {
+                "image": "myregistry.azurecr.io/my-csharp-app1:latest",
+                "resources": {
+                  "requests": {
+                    "cpu": 1,
+                    "memoryInGB": 1.5
+                  }
+                },
+                "ports": [
+                  {
+                    "port": 8080
+                  }
+                ]
+              }
+            }
+          ],
+          "osType": "Linux",
+          "ipAddress": {
+            "type": "Public",
+            "ports": [
+              {
+                "protocol": "TCP",
+                "port": 8080
+              }
+            ]
+          },
+          "restartPolicy": "OnFailure",
+          "imageRegistryCredentials": [
+            {
+              "server": "myregistry.azurecr.io",
+              "username": "myregistry",
+              "password": "myregistryPassword"
+            }
+          ]
+        }
+      }
+    ]
+  }
+  

@@ -1,0 +1,18 @@
+{
+  "name": "iot-ingress-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "aedes": "^0.51.3",
+    "kafka-node": "^5.0.0",
+    "mqtt": "^5.10.1",
+    "net": "^1.0.2"
+  }
+}

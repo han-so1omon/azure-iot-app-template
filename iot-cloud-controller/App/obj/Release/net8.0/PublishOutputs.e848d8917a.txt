@@ -1,0 +1,5 @@
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/bin/Release/net8.0/publish/DotNet.Docker
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/bin/Release/net8.0/publish/DotNet.Docker.dll
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/bin/Release/net8.0/publish/DotNet.Docker.deps.json
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/bin/Release/net8.0/publish/DotNet.Docker.runtimeconfig.json
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/bin/Release/net8.0/publish/DotNet.Docker.pdb

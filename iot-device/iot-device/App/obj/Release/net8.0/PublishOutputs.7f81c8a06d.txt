@@ -1,0 +1,12 @@
+/Users/Shared/p/azure-iot-app-template/iot-device/iot-device/App/bin/Release/net8.0/publish/App
+/Users/Shared/p/azure-iot-app-template/iot-device/iot-device/App/bin/Release/net8.0/publish/appsettings.Development.json
+/Users/Shared/p/azure-iot-app-template/iot-device/iot-device/App/bin/Release/net8.0/publish/appsettings.json
+/Users/Shared/p/azure-iot-app-template/iot-device/iot-device/App/bin/Release/net8.0/publish/App.dll
+/Users/Shared/p/azure-iot-app-template/iot-device/iot-device/App/bin/Release/net8.0/publish/App.deps.json
+/Users/Shared/p/azure-iot-app-template/iot-device/iot-device/App/bin/Release/net8.0/publish/App.runtimeconfig.json
+/Users/Shared/p/azure-iot-app-template/iot-device/iot-device/App/bin/Release/net8.0/publish/App.pdb
+/Users/Shared/p/azure-iot-app-template/iot-device/iot-device/App/bin/Release/net8.0/publish/Microsoft.AspNetCore.OpenApi.dll
+/Users/Shared/p/azure-iot-app-template/iot-device/iot-device/App/bin/Release/net8.0/publish/Microsoft.OpenApi.dll
+/Users/Shared/p/azure-iot-app-template/iot-device/iot-device/App/bin/Release/net8.0/publish/Swashbuckle.AspNetCore.Swagger.dll
+/Users/Shared/p/azure-iot-app-template/iot-device/iot-device/App/bin/Release/net8.0/publish/Swashbuckle.AspNetCore.SwaggerGen.dll
+/Users/Shared/p/azure-iot-app-template/iot-device/iot-device/App/bin/Release/net8.0/publish/Swashbuckle.AspNetCore.SwaggerUI.dll

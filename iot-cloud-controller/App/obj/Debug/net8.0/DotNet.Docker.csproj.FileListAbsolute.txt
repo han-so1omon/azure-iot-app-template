@@ -1,0 +1,14 @@
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/bin/Debug/net8.0/DotNet.Docker
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/bin/Debug/net8.0/DotNet.Docker.deps.json
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/bin/Debug/net8.0/DotNet.Docker.runtimeconfig.json
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/bin/Debug/net8.0/DotNet.Docker.dll
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/bin/Debug/net8.0/DotNet.Docker.pdb
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/obj/Debug/net8.0/DotNet.Docker.GeneratedMSBuildEditorConfig.editorconfig
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/obj/Debug/net8.0/DotNet.Docker.AssemblyInfoInputs.cache
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/obj/Debug/net8.0/DotNet.Docker.AssemblyInfo.cs
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/obj/Debug/net8.0/DotNet.Docker.csproj.CoreCompileInputs.cache
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/obj/Debug/net8.0/DotNet.Docker.dll
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/obj/Debug/net8.0/refint/DotNet.Docker.dll
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/obj/Debug/net8.0/DotNet.Docker.pdb
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/obj/Debug/net8.0/DotNet.Docker.genruntimeconfig.cache
+/Users/Shared/p/azure-iot-app-template/iot-cloud-controller/App/obj/Debug/net8.0/ref/DotNet.Docker.dll

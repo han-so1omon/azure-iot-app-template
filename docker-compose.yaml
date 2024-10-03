@@ -1,0 +1,225 @@
+services:
+  # IoT Ingress Service
+  iot-ingress-service:
+    build:
+      context: ./messaging-service/iot-ingress-service
+      dockerfile: Dockerfile
+    container_name: iot-ingress-service
+    ports:
+      - "1883:1883"  # Expose MQTT port
+    depends_on:
+      - kafka
+    networks:
+      - my-network
+    environment:
+      - NODE_ENV=production
+
+  # Kafka
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    networks:
+      - my-network
+
+  # Zookeeper
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - my-network
+
+  # Analytics Engine
+  analytics-engine:
+    build:
+      context: ./analytics-engine
+      dockerfile: Dockerfile
+    container_name: analytics-engine
+    ports:
+      - "7001:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./analytics-engine:/app
+    depends_on:
+      - kafka
+      - iot-ingress-service
+    networks:
+      - my-network
+
+  # PostgreSQL Database
+  postgres-db:
+    image: postgres:16
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: exampleuser
+      POSTGRES_PASSWORD: examplepass
+      POSTGRES_DB: exampledb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - my-network
+
+  # MongoDB Database
+  mongodb:
+    image: mongo:latest
+    container_name: mongo_db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongouser
+      MONGO_INITDB_ROOT_PASSWORD: mongopass
+      MONGO_INITDB_DATABASE: exampledb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - my-network
+
+  bytebase:
+    image: bytebase/bytebase:latest
+    container_name: bytebase
+    restart: always
+    ports:
+      - "8080:8080"  # Access Bytebase at http://localhost:8080
+    volumes:
+      - bytebase_data:/var/opt/bytebase # Mount volume for Bytebase data
+    environment:
+      - BB_DATA=/var/opt/bytebase  # Data storage path
+    networks:
+      - my-network
+
+  # IoT Cloud Controller
+  iot-cloud-controller:
+    build:
+      context: ./iot-cloud-controller/App
+      dockerfile: Dockerfile
+    container_name: iot-cloud-controller
+    ports:
+      - "4001:80"  # Exposes port 80 from the container to 4001 on the host machine
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    volumes:
+      - ./iot-cloud-controller/App:/app   # Mount the app directory for live changes
+    networks:
+      - my-network
+
+  # IoT Device and Agent Simulator
+  iot-agent-simulator:
+    build:
+      context: ./iot-device/iot-agent-simulator/App
+    container_name: iot-agent-simulator
+    ports:
+      - "5001:80"  # Maps the container's port 80 to port 5001 on the host
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    volumes:
+      - ./iot-device/iot-agent-simulator/App:/app # Mounts the app directory for live changes if needed
+    depends_on:
+      - iot-device-1  # Ensure the server starts before the client
+      - iot-device-2
+      - iot-device-3
+    networks:
+      - my-network
+
+  iot-device-1:
+    build:
+      context: ./iot-device/iot-device/App
+    container_name: iot-device-1
+    ports:
+      - "5002:8080"  # Maps the container's port 80 to port 5002 on the host
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    volumes:
+      - ./iot-device/iot-device/App:/app # Mounts the app directory for live changes if needed
+    depends_on:
+      - iot-ingress-service
+    networks:
+      - my-network
+
+  iot-device-2:
+    build:
+      context: ./iot-device/iot-device/App
+    container_name: iot-device-2
+    ports:
+      - "5003:8080"  # Maps the container's port 80 to port 5003 on the host
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    volumes:
+      - ./iot-device/iot-device/App:/app # Mounts the app directory for live changes if needed
+    depends_on:
+      - iot-ingress-service
+    networks:
+      - my-network
+
+  iot-device-3:
+    build:
+      context: ./iot-device/iot-device/App
+    container_name: iot-device-3
+    ports:
+      - "5004:8080"  # Maps the container's port 80 to port 5004 on the host
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    volumes:
+      - ./iot-device/iot-device/App:/app # Mounts the app directory for live changes if needed
+    depends_on:
+      - iot-ingress-service
+    networks:
+      - my-network
+
+  # Monitoring Dashboard
+  monitoring-dashboard:
+    build:
+      context: ./monitoring-dashboard
+    container_name: monitoring-dashboard
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=development  # Change to "production" for production environments
+    volumes:
+      - ./monitoring-dashboard:/app  # Mounts the current directory to the container to enable live reloading
+      - /app/node_modules  # Ensures node_modules are not overwritten by the host machine
+    command: npm run dev  # Runs the Next.js development server (use "start" for production)
+    networks:
+      - my-network
+
+  # Operator Dashboard
+  operator-dashboard:
+    build:
+      context: ./operator-dashboard
+    container_name: operator-dashboard
+    ports:
+      - "3002:3000"
+    environment:
+      - NODE_ENV=development  # Change to "production" for production environments
+    volumes:
+      - ./operator-dashboard:/app  # Mounts the app directory for live reloading
+      - /app/node_modules  # Ensures node_modules are not overwritten by the host machine
+    command: npm run dev  # Runs the Next.js development server (use "start" for production)
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongo_data:
+  bytebase_data:
