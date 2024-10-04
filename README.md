@@ -7,6 +7,14 @@ This is an application template for establishing an IoT application in Azure Clo
 - Docker + Docker Compose (^v3.8)
 - Dotnet 8 SDK + Runtime (local build + test) 
 
+## Usage
+
+`docker compose up`
+
+or to build fresh
+
+`docker compose up --build`
+
 ## Components
 
 - [IoT device](#iot-device)

@@ -6,13 +6,16 @@ services:
       dockerfile: Dockerfile
     container_name: iot-ingress-service
     ports:
-      - "1883:1883"  # Expose MQTT port
+      - "1883:1883"
     depends_on:
       - kafka
     networks:
       - my-network
     environment:
       - NODE_ENV=production
+    volumes:
+      - ./scripts/wait-for-it.sh:/usr/bin/wait-for-it.sh
+    entrypoint: ["/usr/bin/wait-for-it.sh", "kafka:9092", "-t", "60", "--", "node", "mqtt-broker.js"]
 
   # Kafka
   kafka:
@@ -55,13 +58,14 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
     volumes:
+      - ./scripts/wait-for-it.sh:/usr/bin/wait-for-it.sh
       - ./analytics-engine:/app
-    depends_on:
-      - kafka
-      - iot-ingress-service
-      - postgres-db
     networks:
       - my-network
+    depends_on:
+      - kafka
+      - postgres-db
+    entrypoint: ["/usr/bin/wait-for-it.sh", "postgres-db:5432", "-t", "60", "--", "/usr/bin/wait-for-it.sh", "kafka:9092", "-t", "60", "--", "poetry", "run", "uvicorn", "analytics_engine.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
   # PostgreSQL Database
   postgres-db:
@@ -114,17 +118,18 @@ services:
       dockerfile: Dockerfile
     container_name: iot-cloud-controller
     ports:
-      - "4001:80"  # Exposes port 80 from the container to 4001 on the host machine
+      - "4001:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
     volumes:
-      - ./iot-cloud-controller/App:/app   # Mount the app directory for live changes
-    depends_on:
-      - mongodb
-      - iot-ingress-service
-      - kafka
+      - ./iot-cloud-controller/App:/app
+      - ./scripts/wait-for-it.sh:/usr/bin/wait-for-it.sh
     networks:
       - my-network
+    depends_on:
+      - mongodb
+      - kafka
+    entrypoint: ["/usr/bin/wait-for-it.sh", "mongodb:27017", "-t", "60", "--", "/usr/bin/wait-for-it.sh", "kafka:9092", "-t", "60", "--", "dotnet", "DotNet.Docker.dll"]
 
   # IoT Device and Agent Simulator
   iot-agent-simulator:
@@ -137,12 +142,15 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
     volumes:
       - ./iot-device/iot-agent-simulator/App:/app # Mounts the app directory for live changes if needed
+      - ./scripts/wait-for-it.sh:/usr/bin/wait-for-it.sh  # Mount wait-for-it.sh to /usr/bin/
+    networks:
+      - my-network
     depends_on:
       - iot-device-1  # Ensure the server starts before the client
       - iot-device-2
       - iot-device-3
-    networks:
-      - my-network
+      - iot-ingress-service  # Wait for iot-ingress-service
+    entrypoint: ["/usr/bin/wait-for-it.sh", "iot-device-1:8080", "-t", "60",  "--", "/usr/bin/wait-for-it.sh", "iot-device-2:8080", "-t", "60",  "--", "/usr/bin/wait-for-it.sh", "-t", "60",  "iot-device-3:8080", "--", "dotnet", "DotNet.Docker.dll"]
 
   iot-device-1:
     build:
@@ -154,10 +162,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
     volumes:
       - ./iot-device/iot-device/App:/app # Mounts the app directory for live changes if needed
-    depends_on:
-      - iot-ingress-service
+      - ./scripts/wait-for-it.sh:/usr/bin/wait-for-it.sh  # Mount wait-for-it.sh to /usr/bin/
     networks:
       - my-network
+    depends_on:
+      - iot-ingress-service  # Wait for IoT ingress
+    entrypoint: ["/usr/bin/wait-for-it.sh", "iot-ingress-service:1883", "-t", "60",  "--", "dotnet", "App.dll"]  # Use wait-for-it.sh for MQTT
 
   iot-device-2:
     build:
@@ -169,10 +179,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
     volumes:
       - ./iot-device/iot-device/App:/app # Mounts the app directory for live changes if needed
-    depends_on:
-      - iot-ingress-service
+      - ./scripts/wait-for-it.sh:/usr/bin/wait-for-it.sh  # Mount wait-for-it.sh to /usr/bin/
     networks:
       - my-network
+    depends_on:
+      - iot-ingress-service
+    entrypoint: ["/usr/bin/wait-for-it.sh", "iot-ingress-service:1883", "-t", "60",  "--", "dotnet", "App.dll"]  # Use wait-for-it.sh for MQTT
 
   iot-device-3:
     build:
@@ -184,10 +196,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
     volumes:
       - ./iot-device/iot-device/App:/app # Mounts the app directory for live changes if needed
-    depends_on:
-      - iot-ingress-service
+      - ./scripts/wait-for-it.sh:/usr/bin/wait-for-it.sh  # Mount wait-for-it.sh to /usr/bin/
     networks:
       - my-network
+    depends_on:
+      - iot-ingress-service
+    entrypoint: ["/usr/bin/wait-for-it.sh", "iot-ingress-service:1883", "-t", "60",  "--", "dotnet", "App.dll"]  # Use wait-for-it.sh for MQTT
 
   # Monitoring Dashboard
   monitoring-dashboard:
@@ -197,13 +211,13 @@ services:
     ports:
       - "3001:3000"
     environment:
-      - NODE_ENV=development  # Change to "production" for production environments
+      - NODE_ENV=development
     volumes:
-      - ./monitoring-dashboard:/app  # Mounts the current directory to the container to enable live reloading
-      - /app/node_modules  # Ensures node_modules are not overwritten by the host machine
-    command: npm run dev  # Runs the Next.js development server (use "start" for production)
+      - ./monitoring-dashboard:/app
+      - /app/node_modules
     networks:
       - my-network
+    command: npm run dev
 
   # Operator Dashboard
   operator-dashboard:
@@ -213,13 +227,13 @@ services:
     ports:
       - "3002:3000"
     environment:
-      - NODE_ENV=development  # Change to "production" for production environments
+      - NODE_ENV=development
     volumes:
-      - ./operator-dashboard:/app  # Mounts the app directory for live reloading
-      - /app/node_modules  # Ensures node_modules are not overwritten by the host machine
-    command: npm run dev  # Runs the Next.js development server (use "start" for production)
+      - ./operator-dashboard:/app
+      - /app/node_modules
     networks:
       - my-network
+    command: npm run dev
 
 networks:
   my-network:

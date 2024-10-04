@@ -1,3 +1,4 @@
 - Fix system-log kafka message topic
 - Fix dashboard crashing issues
 - Display iot sensor data and system logs on dashboards
+- Digital twins
