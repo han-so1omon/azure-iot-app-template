@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",
+    "@nivo/bar": "^0.87.0",
+    "@nivo/line": "^0.87.0",
     "axios": "^1.7.7",
     "next": "14.2.13",
     "react": "^18",

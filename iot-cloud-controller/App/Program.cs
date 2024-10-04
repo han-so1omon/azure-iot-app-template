@@ -17,6 +17,7 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "IoT Cloud Controller API v1");
+    c.RoutePrefix = string.Empty; // Access Swagger UI at root URL (http://localhost:PORT/)
 });
 /*
 if (app.Environment.IsDevelopment())
