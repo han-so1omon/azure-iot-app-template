@@ -102,7 +102,7 @@ Operator dashboard specs
 
 Architecture Diagram
 
-![Azure IoT App Architecture](./Azure%20IoT%20App%20Architecture.jpg)
+![Azure IoT App Architecture](./media/Azure%20IoT%20App%20Architecture.jpg)
 
 ## Deployment
 
@@ -113,3 +113,8 @@ Architecture Diagram
 ### Azure Cloud
 
 - Azure Resource Manager
+
+## Gallery
+
+![Monitoring Dashboard](./media/monitoring-dashboard.gif)
+![Operator Dashboard](./media/operator-dashboard.gif)
