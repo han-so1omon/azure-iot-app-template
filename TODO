@@ -1,4 +1,5 @@
-- Fix system-log kafka message topic
-- Fix dashboard crashing issues
-- Display iot sensor data and system logs on dashboards
-- Digital twins
+- Fix device selection on operator dashboard
+- Clean up operator dashboard look
+- Fix monitoring dashboard
+- Implement digital twins with DTDLv3 (or v2)
+- Debug Azure ARM deployment spec (including container startup and health-check procedures)

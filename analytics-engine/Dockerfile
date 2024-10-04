@@ -6,6 +6,9 @@ ENV POETRY_VERSION=1.6.1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+# Install system utilities (curl, net-tools, procps)
+RUN apt-get update && apt-get install -y curl net-tools procps
+
 # Install Poetry
 RUN pip install "poetry==$POETRY_VERSION"
 

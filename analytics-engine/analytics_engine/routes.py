@@ -32,3 +32,17 @@ def average_sensor_value(device: str, sensor: str, db: Session = Depends(get_db)
 @router.get("/analytics/trends/")
 def sensor_trends(device: str, sensor: str, db: Session = Depends(get_db)):
     return analytics.get_trends(db, device=device, sensor=sensor)
+
+# Route to get all unique device IDs
+@router.get("/devices/")
+def get_all_devices(db: Session = Depends(get_db)):
+    devices = crud.get_all_device_ids(db)
+    return {"devices": devices}
+
+# Route to get all readings for a specific device by ID
+@router.get("/devices/{device_id}/readings/")
+def get_readings_by_device(device_id: str, db: Session = Depends(get_db)):
+    readings = crud.get_readings_by_device(db, device_id=device_id)
+    if not readings:
+        raise HTTPException(status_code=404, detail="No readings found for this device")
+    return readings

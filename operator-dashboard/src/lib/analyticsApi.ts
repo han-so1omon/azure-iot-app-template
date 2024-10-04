@@ -4,12 +4,14 @@ const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_ANALYTICS_API_BASE_URL,
 });
 
-export const fetchDeviceStatus = async (deviceId: string) => {
-  const response = await api.get(`/analytics/status/${deviceId}`);
+// Fetch all device IDs
+export const fetchAllDevices = async () => {
+  const response = await api.get("/devices/");
   return response.data;
 };
 
-export const fetchDeviceTrends = async (deviceId: string, sensor: string) => {
-  const response = await api.get(`/analytics/trends?device=${deviceId}&sensor=${sensor}`);
+// Fetch all readings by device ID
+export const fetchDeviceReadings = async (deviceId: string) => {
+  const response = await api.get(`/devices/${deviceId}/readings/`);
   return response.data;
 };

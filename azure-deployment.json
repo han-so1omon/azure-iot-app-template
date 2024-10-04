@@ -1,253 +1,332 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "resources": [
-      {
-        "type": "Microsoft.DBforPostgreSQL/servers",
-        "apiVersion": "2017-12-01",
-        "name": "myPostgreSQLServer",
-        "location": "[resourceGroup().location]",
-        "sku": {
-          "name": "GP_Gen5_2",
-          "tier": "GeneralPurpose",
-          "family": "Gen5",
-          "capacity": 2
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.DBforPostgreSQL/servers",
+      "apiVersion": "2017-12-01",
+      "name": "myPostgreSQLServer",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "GP_Gen5_2",
+        "tier": "GeneralPurpose",
+        "family": "Gen5",
+        "capacity": 2
+      },
+      "properties": {
+        "administratorLogin": "adminuser",
+        "administratorLoginPassword": "SecurePassword123!",
+        "version": "11",
+        "storageProfile": {
+          "storageMB": 51200,
+          "backupRetentionDays": 7,
+          "geoRedundantBackup": "Disabled"
         },
-        "properties": {
-          "administratorLogin": "adminuser",
-          "administratorLoginPassword": "SecurePassword123!",
-          "version": "11",
-          "storageProfile": {
-            "storageMB": 51200,
-            "backupRetentionDays": 7,
-            "geoRedundantBackup": "Disabled"
+        "sslEnforcement": "Enabled"
+      }
+    },
+    {
+      "type": "Microsoft.HDInsight/clusters",
+      "apiVersion": "2018-06-01-preview",
+      "name": "kafkaCluster",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "clusterVersion": "4.0",
+        "osType": "Linux",
+        "tier": "Standard",
+        "clusterDefinition": {
+          "kind": "Kafka",
+          "componentVersion": {
+            "Kafka": "2.1"
           },
-          "sslEnforcement": "Enabled"
-        }
-      },
-      {
-        "type": "Microsoft.HDInsight/clusters",
-        "apiVersion": "2018-06-01-preview",
-        "name": "kafkaCluster",
-        "location": "[resourceGroup().location]",
-        "properties": {
-          "clusterVersion": "4.0",
-          "osType": "Linux",
-          "tier": "Standard",
-          "clusterDefinition": {
-            "kind": "Kafka",
-            "componentVersion": {
-              "Kafka": "2.1"
+          "configurations": {}
+        },
+        "computeProfile": {
+          "roles": [
+            {
+              "name": "headnode",
+              "targetInstanceCount": 2,
+              "hardwareProfile": {
+                "vmSize": "Standard_D3_V2"
+              }
             },
-            "configurations": {}
-          },
-          "computeProfile": {
-            "roles": [
-              {
-                "name": "headnode",
-                "targetInstanceCount": 2,
-                "hardwareProfile": {
-                  "vmSize": "Standard_D3_V2"
-                }
-              },
-              {
-                "name": "workernode",
-                "targetInstanceCount": 3,
-                "hardwareProfile": {
-                  "vmSize": "Standard_D3_V2"
-                }
-              },
-              {
-                "name": "zookeepernode",
-                "targetInstanceCount": 3,
-                "hardwareProfile": {
-                  "vmSize": "Standard_D3_V2"
-                }
-              }
-            ]
-          }
-        }
-      },
-      {
-        "type": "Microsoft.ContainerInstance/containerGroups",
-        "apiVersion": "2019-12-01",
-        "name": "python-app",
-        "location": "[resourceGroup().location]",
-        "properties": {
-          "containers": [
             {
-              "name": "python-app",
-              "properties": {
-                "image": "myregistry.azurecr.io/my-python-app:latest",
-                "resources": {
-                  "requests": {
-                    "cpu": 1,
-                    "memoryInGB": 1.5
-                  }
-                },
-                "ports": [
-                  {
-                    "port": 8000
-                  }
-                ]
+              "name": "workernode",
+              "targetInstanceCount": 3,
+              "hardwareProfile": {
+                "vmSize": "Standard_D3_V2"
               }
-            }
-          ],
-          "osType": "Linux",
-          "ipAddress": {
-            "type": "Public",
-            "ports": [
-              {
-                "protocol": "TCP",
-                "port": 8000
-              }
-            ]
-          },
-          "restartPolicy": "OnFailure",
-          "imageRegistryCredentials": [
+            },
             {
-              "server": "myregistry.azurecr.io",
-              "username": "myregistry",
-              "password": "myregistryPassword"
-            }
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.ContainerInstance/containerGroups",
-        "apiVersion": "2019-12-01",
-        "name": "nextjs-app1",
-        "location": "[resourceGroup().location]",
-        "properties": {
-          "containers": [
-            {
-              "name": "nextjs-app1",
-              "properties": {
-                "image": "myregistry.azurecr.io/my-nextjs-app1:latest",
-                "resources": {
-                  "requests": {
-                    "cpu": 1,
-                    "memoryInGB": 1.5
-                  }
-                },
-                "ports": [
-                  {
-                    "port": 3000
-                  }
-                ]
+              "name": "zookeepernode",
+              "targetInstanceCount": 3,
+              "hardwareProfile": {
+                "vmSize": "Standard_D3_V2"
               }
-            }
-          ],
-          "osType": "Linux",
-          "ipAddress": {
-            "type": "Public",
-            "ports": [
-              {
-                "protocol": "TCP",
-                "port": 3000
-              }
-            ]
-          },
-          "restartPolicy": "OnFailure",
-          "imageRegistryCredentials": [
-            {
-              "server": "myregistry.azurecr.io",
-              "username": "myregistry",
-              "password": "myregistryPassword"
-            }
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.ContainerInstance/containerGroups",
-        "apiVersion": "2019-12-01",
-        "name": "nextjs-app2",
-        "location": "[resourceGroup().location]",
-        "properties": {
-          "containers": [
-            {
-              "name": "nextjs-app2",
-              "properties": {
-                "image": "myregistry.azurecr.io/my-nextjs-app2:latest",
-                "resources": {
-                  "requests": {
-                    "cpu": 1,
-                    "memoryInGB": 1.5
-                  }
-                },
-                "ports": [
-                  {
-                    "port": 3000
-                  }
-                ]
-              }
-            }
-          ],
-          "osType": "Linux",
-          "ipAddress": {
-            "type": "Public",
-            "ports": [
-              {
-                "protocol": "TCP",
-                "port": 3000
-              }
-            ]
-          ],
-          "restartPolicy": "OnFailure",
-          "imageRegistryCredentials": [
-            {
-              "server": "myregistry.azurecr.io",
-              "username": "myregistry",
-              "password": "myregistryPassword"
-            }
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.ContainerInstance/containerGroups",
-        "apiVersion": "2019-12-01",
-        "name": "csharp-app1",
-        "location": "[resourceGroup().location]",
-        "properties": {
-          "containers": [
-            {
-              "name": "csharp-app1",
-              "properties": {
-                "image": "myregistry.azurecr.io/my-csharp-app1:latest",
-                "resources": {
-                  "requests": {
-                    "cpu": 1,
-                    "memoryInGB": 1.5
-                  }
-                },
-                "ports": [
-                  {
-                    "port": 8080
-                  }
-                ]
-              }
-            }
-          ],
-          "osType": "Linux",
-          "ipAddress": {
-            "type": "Public",
-            "ports": [
-              {
-                "protocol": "TCP",
-                "port": 8080
-              }
-            ]
-          },
-          "restartPolicy": "OnFailure",
-          "imageRegistryCredentials": [
-            {
-              "server": "myregistry.azurecr.io",
-              "username": "myregistry",
-              "password": "myregistryPassword"
             }
           ]
         }
       }
-    ]
-  }
-  
+    },
+    {
+      "type": "Microsoft.ContainerInstance/containerGroups",
+      "apiVersion": "2019-12-01",
+      "name": "iot-ingress-service",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "containers": [
+          {
+            "name": "iot-ingress-service",
+            "properties": {
+              "image": "myregistry.azurecr.io/iot-ingress-service:latest",
+              "resources": {
+                "requests": {
+                  "cpu": 1,
+                  "memoryInGB": 1
+                }
+              },
+              "ports": [
+                {
+                  "port": 1883
+                }
+              ],
+              "environmentVariables": [
+                {
+                  "name": "NODE_ENV",
+                  "value": "production"
+                }
+              ],
+              "command": ["/usr/bin/wait-for-it.sh", "kafka:9092", "-t", "60", "--", "node", "mqtt-broker.js"]
+            }
+          }
+        ],
+        "osType": "Linux",
+        "ipAddress": {
+          "type": "Public",
+          "ports": [
+            {
+              "protocol": "TCP",
+              "port": 1883
+            }
+          ]
+        },
+        "restartPolicy": "OnFailure",
+        "imageRegistryCredentials": [
+          {
+            "server": "myregistry.azurecr.io",
+            "username": "myregistry",
+            "password": "myregistryPassword"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.ContainerInstance/containerGroups",
+      "apiVersion": "2019-12-01",
+      "name": "analytics-engine",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "containers": [
+          {
+            "name": "analytics-engine",
+            "properties": {
+              "image": "myregistry.azurecr.io/analytics-engine:latest",
+              "resources": {
+                "requests": {
+                  "cpu": 1,
+                  "memoryInGB": 1.5
+                }
+              },
+              "ports": [
+                {
+                  "port": 8000
+                }
+              ],
+              "environmentVariables": [
+                {
+                  "name": "PYTHONUNBUFFERED",
+                  "value": "1"
+                }
+              ],
+              "command": ["/usr/bin/wait-for-it.sh", "postgres-db:5432", "-t", "60", "--", "/usr/bin/wait-for-it.sh", "kafka:9092", "-t", "60", "--", "poetry", "run", "uvicorn", "analytics_engine.main:app", "--host", "0.0.0.0", "--port", "8000"]
+            }
+          }
+        ],
+        "osType": "Linux",
+        "ipAddress": {
+          "type": "Public",
+          "ports": [
+            {
+              "protocol": "TCP",
+              "port": 8000
+            }
+          ]
+        },
+        "restartPolicy": "OnFailure",
+        "imageRegistryCredentials": [
+          {
+            "server": "myregistry.azurecr.io",
+            "username": "myregistry",
+            "password": "myregistryPassword"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.ContainerInstance/containerGroups",
+      "apiVersion": "2019-12-01",
+      "name": "iot-cloud-controller",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "containers": [
+          {
+            "name": "iot-cloud-controller",
+            "properties": {
+              "image": "myregistry.azurecr.io/iot-cloud-controller:latest",
+              "resources": {
+                "requests": {
+                  "cpu": 1,
+                  "memoryInGB": 1.5
+                }
+              },
+              "ports": [
+                {
+                  "port": 80
+                }
+              ],
+              "environmentVariables": [
+                {
+                  "name": "ASPNETCORE_ENVIRONMENT",
+                  "value": "Production"
+                }
+              ],
+              "command": ["/usr/bin/wait-for-it.sh", "mongodb:27017", "-t", "60", "--", "/usr/bin/wait-for-it.sh", "kafka:9092", "-t", "60", "--", "dotnet", "DotNet.Docker.dll"]
+            }
+          }
+        ],
+        "osType": "Linux",
+        "ipAddress": {
+          "type": "Public",
+          "ports": [
+            {
+              "protocol": "TCP",
+              "port": 80
+            }
+          ]
+        },
+        "restartPolicy": "OnFailure",
+        "imageRegistryCredentials": [
+          {
+            "server": "myregistry.azurecr.io",
+            "username": "myregistry",
+            "password": "myregistryPassword"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.ContainerInstance/containerGroups",
+      "apiVersion": "2019-12-01",
+      "name": "monitoring-dashboard",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "containers": [
+          {
+            "name": "monitoring-dashboard",
+            "properties": {
+              "image": "myregistry.azurecr.io/monitoring-dashboard:latest",
+              "resources": {
+                "requests": {
+                  "cpu": 1,
+                  "memoryInGB": 1
+                }
+              },
+              "ports": [
+                {
+                  "port": 3001
+                }
+              ],
+              "environmentVariables": [
+                {
+                  "name": "NODE_ENV",
+                  "value": "development"
+                }
+              ],
+              "command": ["npm", "run", "dev"]
+            }
+          }
+        ],
+        "osType": "Linux",
+        "ipAddress": {
+          "type": "Public",
+          "ports": [
+            {
+              "protocol": "TCP",
+              "port": 3001
+            }
+          ]
+        },
+        "restartPolicy": "OnFailure",
+        "imageRegistryCredentials": [
+          {
+            "server": "myregistry.azurecr.io",
+            "username": "myregistry",
+            "password": "myregistryPassword"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.ContainerInstance/containerGroups",
+      "apiVersion": "2019-12-01",
+      "name": "operator-dashboard",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "containers": [
+          {
+            "name": "operator-dashboard",
+            "properties": {
+              "image": "myregistry.azurecr.io/operator-dashboard:latest",
+              "resources": {
+                "requests": {
+                  "cpu": 1,
+                  "memoryInGB": 1
+                }
+              },
+              "ports": [
+                {
+                  "port": 3002
+                }
+              ],
+              "environmentVariables": [
+                {
+                  "name": "NODE_ENV",
+                  "value": "development"
+                }
+              ],
+              "command": ["npm", "run", "dev"]
+            }
+          }
+        ],
+        "osType": "Linux",
+        "ipAddress": {
+          "type": "Public",
+          "ports": [
+            {
+              "protocol": "TCP",
+              "port": 3002
+            }
+          ]
+        },
+        "restartPolicy": "OnFailure",
+        "imageRegistryCredentials": [
+          {
+            "server": "myregistry.azurecr.io",
+            "username": "myregistry",
+            "password": "myregistryPassword"
+          }
+        ]
+      }
+    }
+  ]
+}
