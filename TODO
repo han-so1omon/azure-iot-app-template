@@ -1,5 +1,6 @@
 - Fix device selection on operator dashboard
 - Clean up operator dashboard look
 - Fix monitoring dashboard
+- Clear kafka between each run
 - Implement digital twins with DTDLv3 (or v2)
 - Debug Azure ARM deployment spec (including container startup and health-check procedures)

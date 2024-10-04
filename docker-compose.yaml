@@ -79,6 +79,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./data-store/init_postgres.sh:/docker-entrypoint-initdb.d/init_postgres.sh
     networks:
       - my-network
 
@@ -120,7 +121,7 @@ services:
     ports:
       - "4001:80"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Development
     volumes:
       - ./iot-cloud-controller/App:/app
       - ./scripts/wait-for-it.sh:/usr/bin/wait-for-it.sh

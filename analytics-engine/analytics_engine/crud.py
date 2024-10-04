@@ -1,9 +1,19 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
+from datetime import datetime, timedelta
 from analytics_engine.models import DeviceReading
 
-# Get all readings with pagination
+# Get all readings with pagination, but only those from the last hour
 def get_readings(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(DeviceReading).offset(skip).limit(limit).all()
+    five_minutes_ago = datetime.utcnow() - timedelta(minutes=5)
+    return (
+        db.query(DeviceReading)
+        .filter(DeviceReading.timestamp >= five_minutes_ago)
+        .order_by(DeviceReading.timestamp.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
 
 # Get a reading by ID
 def get_reading_by_id(db: Session, reading_id: int):
@@ -40,6 +50,13 @@ def get_all_device_ids(db: Session):
     # Flatten the list of tuples into a list of device IDs
     return [device_id[0] for device_id in device_ids]
 
-# Get all readings for a specific device
+# Get all readings for a specific device, but only those from the last hour
 def get_readings_by_device(db: Session, device_id: str):
-    return db.query(DeviceReading).filter(DeviceReading.device == device_id).all()
+    five_minutes_ago = datetime.utcnow() - timedelta(minutes=5)
+    return (
+        db.query(DeviceReading)
+        .filter(DeviceReading.device == device_id)
+        .filter(DeviceReading.timestamp >= five_minutes_ago)
+        .order_by(DeviceReading.timestamp.desc())
+        .all()
+    )

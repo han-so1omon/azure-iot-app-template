@@ -54,8 +54,8 @@ namespace IoTAgentSimulator.Services
                 // Push the device state to the ingress API
                 await _deviceService.PushDeviceStateAsync(_deviceId);
 
-                // Wait for a random period between 5 to 10 seconds
-                var delay = random.Next(5000, 10000);
+                // Wait for a random period between 3 to 5 seconds
+                var delay = random.Next(3000, 5000);
                 await Task.Delay(delay, cancellationToken);
             }
 
