@@ -1,3 +1,6 @@
+WIP: Note that this is a work in progress. For a production environment, optimize infrastructure specs,
+API routes, data models, etc
+
 # General
 
 This is an application template for establishing an IoT application in Azure Cloud
